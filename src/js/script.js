@@ -94,11 +94,10 @@ window.addEventListener('DOMContentLoaded', function () {
 
 	setClock('.timer', deadline);
 
-	//? Modal idi nahyi
+	//? Modal
 
 	const modalTrigger = document.querySelectorAll('[data-modal]'),
 		modal = document.querySelector('.modal');
-
 
 	// timelaps auto-open modal window
 	const autoOpenModalWindow = setTimeout(openModal, 50000);
@@ -152,8 +151,18 @@ window.addEventListener('DOMContentLoaded', function () {
 	window.addEventListener('scroll', showModalByScroll);
 
 
+	const getResource = async (url) => {
+		const res = await fetch(url);
 
-	//? Используем классы для карточек:
+		if (!res.ok) {
+			throw new Error(`Could not fetch ${url}, status ${res.status}`);
+		}
+
+		return await res.json();
+	};
+
+
+	//? Используем классы для карточек + fetch requests:
 	class MenuCard {
 		constructor(src, alt, title, descr, price, parentSelector, ...classes) {
 			this.src = src;
@@ -195,32 +204,24 @@ window.addEventListener('DOMContentLoaded', function () {
 		};
 	};
 
-	new MenuCard(
-		"./img/tabs/vegy.jpg",
-		"vegy",
-		'Меню "Фитнес"',
-		'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-		9,
-		'.menu .container',
-	).render();
-
-	new MenuCard(
-		"./img/tabs/elite.jpg",
-		"elite",
-		'Меню “Премиум”',
-		'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-		18,
-		'.menu .container',
-	).render();
-
-	new MenuCard(
-		"./img/tabs/post.jpg",
-		"post",
-		'Меню "Постное"',
-		'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-		14,
-		'.menu .container',
-	).render();
+	/*
+		getResource('http://localhost:3000/menu')
+			.then(data => {
+				data.forEach(({ img, altimg, title, descr, price }) => {
+					new MenuCard(img, altimg, title, descr,
+						price, '.menu .container').render();
+				});
+			});
+	
+	*/
+	//? переключение слайдера с помощью библиотеки axios
+	axios.get('http://localhost:3000/menu')
+		.then(data => {
+			data.data.forEach(({ img, altimg, title, descr, price }) => {
+				new MenuCard(img, altimg, title, descr,
+					price, '.menu .container').render();
+			});
+		});
 
 
 	//? Forms
@@ -233,10 +234,22 @@ window.addEventListener('DOMContentLoaded', function () {
 	};
 
 	forms.forEach(item => {
-		postData(item);
+		bindPostData(item);
 	});
 
-	function postData(form) {
+	const postData = async (url, data) => {
+		const res = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-type': 'application/json',
+			},
+			body: data
+		});
+
+		return await res.json()
+	};
+
+	function bindPostData(form) {
 		form.addEventListener('submit', (e) => {
 			e.preventDefault();
 
@@ -248,31 +261,30 @@ window.addEventListener('DOMContentLoaded', function () {
 			`;
 
 			form.insertAdjacentElement('afterend', statusMessage);
-			// form.appendChild(statusMessage);
 
-			const request = new XMLHttpRequest();
-			request.open('POST', '../../server.php');
-			request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
 			const formData = new FormData(form);
 
-			const object = {};
-			formData.forEach(function (value, key) {
-				object[key] = value;
-			});
-			const json = JSON.stringify(object);
+			/*
+				const object = {};
+				formData.forEach(function (value, key) {
+					object[key] = value;
+				});
+			*/
 
-			request.send(json);
+			const json = JSON.stringify(Object.fromEntries(formData.entries()));
 
-			request.addEventListener('load', () => {
-				if (request.status === 200) {
-					console.log(request.response);
+			postData('http://localhost:3000/requests', json)
+				.then(data => data.text())
+				.then(data => {
+					console.log(data);
 					showThanksModal(message.success);
 					form.reset();
 					statusMessage.remove();
-				} else {
+				}).catch(() => {
 					showThanksModal(message.failure);
-				}
-			});
+				}).finally(() => {
+					form.reset();
+				});
 		});
 	};
 
@@ -306,7 +318,111 @@ window.addEventListener('DOMContentLoaded', function () {
 		}, 1000);
 	};
 
+	fetch('../../db.json')
+		.then(data => data.json())
+		.then(res => console.log(res));
+
+
+	/*============================================================================================================*/
+	//? переключение в слайдере:
+
+
+	/*
+		const slides = document.querySelectorAll('.offer__slide'),
+		slider = document.querySelector('.offer__slider'),
+		prev = document.querySelector('.offer__slider-prev'),
+		next = document.querySelector('.offer__slider-next'),
+		total = document.querySelector('#total'),
+		current = document.querySelector('#current'),
+		slidesWrapper = document.querySelector('.offer__slider-wrapper'),
+		width = window.getComputedStyle(slidesWrapper).width,
+		slidesField = document.querySelector('.offer__slider-inner');
+	
+		console.log(slidesWrapper);
+	
+		slidesField.style.width = 100 * slides.length + '%';
+		slidesField.style.display = 'flex';
+		slidesField.style.transition = '0.5s all';
+	
+		slidesWrapper.style.overflow = 'hidden';
+	
+		slides.forEach(slide => {
+			slide.style.width = width;
+		});
+	*/
+
+
+
+
 
 });
+			// offerSliderWrapper.childNodes.forEach((item, index) => {
+			// 	if (item.classList.contains('offer__slider-next')){
+			// 		console.log('we');
+			// 	}
+			// })
 
+/*
+	nextSlider.forEach(item => {
+		item.addEventListener('click', (event) => {
+			if (event) {
+				// plus(indexSlider).classList.add('hide');
+				plus(indexSlider + 1).classList.remove('hide');
+				console.log(indexSlider);
+	
+			}
+		})
+	})
+*/
+
+
+/*
+? post запросы на сервер
+	const postData = async (url, data) => {
+	const res = await fetch(url, {
+		method: 'POST',
+		headers: {
+			'Content-type': 'application/json',
+		},
+		body: data
+	});
+	
+	return await res.json()
+};
+*/
+
+
+/*
+! вариант со слайдерами, с библиотекой axios
+	axios.get('http://localhost:3000/offerBlockImage')
+		.then(data => {
+			console.log(data.data);
+		});
+	
+*/
+/*
+	fetch('../../db.json')
+	.then(data => data.json())
+	.then(res => console.log(res));
+	
+const getResource = async (url) => {
+	const res = await fetch(url);
+	
+	if (!res.ok) {
+		throw new Error(`Could not fetch ${url}, status ${res.status}`);
+	}
+	
+	return await res.json();
+};
+	
+! axios:
+axios.get('http://localhost:3000/menu')
+	.then(data => {
+		data.data.forEach(({ img, altimg, title, descr, price }) => {
+			new MenuCard(img, altimg, title, descr,
+				price, '.menu .container').render();
+		});
+	});
+	
+*/
 
