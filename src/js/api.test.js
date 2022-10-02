@@ -104,3 +104,20 @@ function createCard(data) {
 		document.querySelector('.menu .container').append(element);
 	});
 }
+
+
+
+///! v
+if (indexSlider == slides.length - 1) {
+	indexSlider = 0;
+} else indexSlider++;
+
+if (slides.length < 10) {
+
+	if (indexSlider === 0) {
+		current.textContent = `0${slides.length}`
+	} else {
+		current.textContent = `0${indexSlider}`
+	};
+
+} else current.textContent = indexSlider;
