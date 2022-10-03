@@ -121,3 +121,56 @@ if (slides.length < 10) {
 	};
 
 } else current.textContent = indexSlider;
+
+
+
+/*
+? post запросы на сервер
+	const postData = async (url, data) => {
+	const res = await fetch(url, {
+		method: 'POST',
+		headers: {
+			'Content-type': 'application/json',
+		},
+		body: data
+	});
+	
+	return await res.json()
+};
+*/
+
+
+/*
+! вариант со слайдерами, с библиотекой axios
+	axios.get('http://localhost:3000/offerBlockImage')
+		.then(data => {
+			console.log(data.data);
+		});
+	
+*/
+/*
+	fetch('../../db.json')
+	.then(data => data.json())
+	.then(res => console.log(res));
+	
+const getResource = async (url) => {
+	const res = await fetch(url);
+	
+	if (!res.ok) {
+		throw new Error(`Could not fetch ${url}, status ${res.status}`);
+	}
+	
+	return await res.json();
+};
+	
+! axios:
+axios.get('http://localhost:3000/menu')
+	.then(data => {
+		data.data.forEach(({ img, altimg, title, descr, price }) => {
+			new MenuCard(img, altimg, title, descr,
+				price, '.menu .container').render();
+		});
+	});
+	
+*/
+

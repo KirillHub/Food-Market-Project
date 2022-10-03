@@ -357,7 +357,6 @@ window.addEventListener('DOMContentLoaded', function () {
 			const element = document.createElement('div');
 			element.classList.add(`${this.parentOfferSlide}`);
 			// element.classList.add(this.classes);
-			// element.style.position = 'relative';
 
 			if (this.classes.length !== 0) {
 				this.classes.forEach(visibleClassStyle => {
@@ -369,9 +368,6 @@ window.addEventListener('DOMContentLoaded', function () {
 
 			const parentElement = document.querySelector(`.${this.parentOfferInner}`);
 
-			// if (parentElement.childNodes.keys('text')) {
-			// 	parentElement.removeChild(parentElement.firstChild);
-			// };
 			parentElement.append(element);
 		};
 
@@ -385,7 +381,7 @@ window.addEventListener('DOMContentLoaded', function () {
 			parentOfferBlockInner.style.display = 'flex';
 			parentOfferBlockInner.style.transition = '0.5s all';
 
-			parentOfferBlockWrapper.style.overflow = 'hidden'; // ! с этого места можно дальше плясать
+			parentOfferBlockWrapper.style.overflow = 'hidden';
 		};
 
 	};
@@ -428,7 +424,7 @@ window.addEventListener('DOMContentLoaded', function () {
 				width = window.getComputedStyle(slidesWrapper).width,
 				slidesField = document.querySelector('.offer__slider-inner');
 
-			slides.forEach(slide => slide.style.width = width);
+			slides.forEach(slide => slide.style.width = replaceString(width));
 
 			slider.style.position = 'relative';
 
@@ -449,6 +445,26 @@ window.addEventListener('DOMContentLoaded', function () {
 				list-style: none;
 				`;
 			slider.append(indicators);
+
+
+			function replaceString(string) {
+				return +Math.round(+string.slice(0, string.length - 2))
+			};
+
+			const dotStyles = (dots = []) => {
+				dots.forEach(dot => dot.style.opacity = '.5');
+				dots[slideIndex - 1].style.opacity = 1;
+			};
+
+			const sliderCurrentValues = (slides, slideIndex, total, current) => {
+				if (slides.length < 10) {
+					total.textContent = `0${slides.length}`;
+					current.textContent = `0${slideIndex}`;
+				} else {
+					total.textContent = slides.length;
+					current.textContent = slideIndex;
+				};
+			};
 
 
 			for (let i = 0; i < slides.length; i++) {
@@ -477,62 +493,38 @@ window.addEventListener('DOMContentLoaded', function () {
 				dots.push(dot);
 			}
 
-			if (slides.length < 10) {
-				total.textContent = `0${slides.length}`;
-				current.textContent = `0${slideIndex}`;
-			} else {
-				total.textContent = slides.length;
-				current.textContent = slideIndex;
-			};
+			sliderCurrentValues(slides, slideIndex, total, current);
 
 			next.addEventListener('click', () => {
-				if (offset == +width.slice(0, width.length - 2) * (slides.length - 1)) {
+				if (offset == replaceString(width) * (slides.length - 1)) {
 					offset = 0;
-				} else {
-					offset += +width.slice(0, width.length - 2);
-				}
+				} else offset += replaceString(width);
 
 				slidesField.style.transform = `translateX(-${offset}px)`;
 
 				if (slideIndex == slides.length) {
 					slideIndex = 1;
-				} else {
-					slideIndex++;
-				};
+				} else slideIndex++;
 
-				if (slides.length < 10) {
-					current.textContent = `0${slideIndex}`;
-				} else {
-					current.textContent = slideIndex;
-				};
+				sliderCurrentValues(slides, slideIndex, total, current);
 
-				dots.forEach(dot => dot.style.opacity = '.5');
-				dots[slideIndex - 1].style.opacity = 1;
+				dotStyles(dots);
 			});
 
 			prev.addEventListener('click', () => {
 				if (offset == 0) {
-					offset = +width.slice(0, width.length - 2) * (slides.length - 1);
-				} else {
-					offset -= +width.slice(0, width.length - 2);
-				}
+					offset = replaceString(width) * (slides.length - 1);
+				} else offset -= replaceString(width);
 
 				slidesField.style.transform = `translateX(-${offset}px)`;
 
 				if (slideIndex == 1) {
 					slideIndex = slides.length;
-				} else {
-					slideIndex--;
-				};
+				} else slideIndex--;
 
-				if (slides.length < 10) {
-					current.textContent = `0${slideIndex}`;
-				} else {
-					current.textContent = slideIndex;
-				};
+				sliderCurrentValues(slides, slideIndex, total, current);
 
-				dots.forEach(dot => dot.style.opacity = '.5');
-				dots[slideIndex - 1].style.opacity = 1;
+				dotStyles(dots);
 			});
 
 			dots.forEach(dot => {
@@ -540,73 +532,134 @@ window.addEventListener('DOMContentLoaded', function () {
 					const slideTo = e.target.getAttribute('data-slide-to');
 
 					slideIndex = slideTo;
-					offset = +width.slice(0, width.length - 2) * (slideTo - 1);
+					offset = replaceString(width) * (slideTo - 1);
 
 					slidesField.style.transform = `translateX(-${offset}px)`;
 
 					if (slides.length < 10) {
 						current.textContent = `0${slideIndex}`;
-					} else {
-						current.textContent = slideIndex;
-					};
+					} else current.textContent = slideIndex;
 
-					dots.forEach(dot => dot.style.opacity = '.5');
-					dots[slideIndex - 1].style.opacity = 1;
+					dotStyles(dots);
 				});
 
 			});
 		});
+
+
+
+	// Calc
+
+	const result = document.querySelector('.calculating__result span'),
+		choosedMaleParentBlock = document.querySelector('.calculating__choose'),
+		calculatingChooseMediumParent = document.querySelector('.calculating__choose_medium'),
+		physicallyActiveChoose = document.querySelector('.calculating__choose_big');
+
+
+	function calculateCalories(choosedMaleParent = []) {
+
+		choosedMaleParent.forEach(item => {
+
+			item.addEventListener('click', e => {
+
+				choosedMaleParent.forEach(childrenItems => {
+					if (childrenItems.tagName === 'DIV'
+						&& childrenItems.classList.contains('calculating__choose-item_active')) {
+						childrenItems.classList.remove('calculating__choose-item_active');
+						e.target.classList.add('calculating__choose-item_active');
+					};
+				});
+				localStorage.setItem('choosedMale', e.target.id)
+
+			});
+		});
+	};
+
+
+	function calculatingConfiguration(calculatingChooseMediumParent) {
+		calculatingChooseMediumParent.childNodes.forEach(childInput => {
+			if (childInput.tagName === 'INPUT') {
+
+				if (childInput.textContent === '' &&
+					(localStorage.getItem('userHeight') ||
+						localStorage.getItem('userWeight') ||
+						localStorage.getItem('userAge'))) {
+					localStorage.removeItem('userHeight');
+					localStorage.removeItem('userWeight');
+					localStorage.removeItem('userAge');
+				}
+
+				childInput.addEventListener('change', event => {
+
+					if (event.target.id === 'height') {
+						localStorage.setItem('userHeight', event.target.value);
+					};
+
+					if (event.target.id === 'weight') {
+						localStorage.setItem('userWeight', event.target.value);
+					};
+
+					if (event.target.id === 'age') {
+						localStorage.setItem('userAge', event.target.value);
+					};
+
+				});
+			}
+		});
+	};
+
+
+	function getPhysicallyActiveChoose(physicallyActiveChoose) {
+		physicallyActiveChoose.forEach(physicallyActiveChooseItem => {
+
+			physicallyActiveChooseItem.addEventListener('click', event => {
+
+				physicallyActiveChoose.forEach(item => {
+					if (item.tagName === 'DIV'
+						&& item.classList.contains('calculating__choose-item_active')) {
+						item.classList.remove('calculating__choose-item_active');
+						event.target.classList.add('calculating__choose-item_active');
+
+						const dataRationValue = event.target.getAttribute('data-ratio');
+						localStorage.setItem('dataRationValue', dataRationValue);
+					};
+				});
+
+			});
+
+		});
+	};
+
+	getPhysicallyActiveChoose(physicallyActiveChoose.childNodes);
+	calculateCalories(choosedMaleParentBlock.childNodes);
+	calculatingConfiguration(calculatingChooseMediumParent)
+
+
+	const calculateDailyCalorieIntake = (result) => {
+		const localStorageData = localStorage;
+
+		let maleData = localStorageData.getItem('choosedMale');
+
+		if (maleData === 'male') maleData = 88.36;
+		if (maleData === 'female') maleData = 447.6;
+
+		console.log(maleData);
+
+	};
+	calculateDailyCalorieIntake(result);
+
+
+	/*
+	
+	*/
+
+	/*
+		const height = document.querySelector('#height');
+		height.addEventListener('change', event => {
+			console.log(event.target.value);
+		})
+	*/
+
 });
 
-
-
-/*
-? post запросы на сервер
-	const postData = async (url, data) => {
-	const res = await fetch(url, {
-		method: 'POST',
-		headers: {
-			'Content-type': 'application/json',
-		},
-		body: data
-	});
-	
-	return await res.json()
-};
-*/
-
-
-/*
-! вариант со слайдерами, с библиотекой axios
-	axios.get('http://localhost:3000/offerBlockImage')
-		.then(data => {
-			console.log(data.data);
-		});
-	
-*/
-/*
-	fetch('../../db.json')
-	.then(data => data.json())
-	.then(res => console.log(res));
-	
-const getResource = async (url) => {
-	const res = await fetch(url);
-	
-	if (!res.ok) {
-		throw new Error(`Could not fetch ${url}, status ${res.status}`);
-	}
-	
-	return await res.json();
-};
-	
-! axios:
-axios.get('http://localhost:3000/menu')
-	.then(data => {
-		data.data.forEach(({ img, altimg, title, descr, price }) => {
-			new MenuCard(img, altimg, title, descr,
-				price, '.menu .container').render();
-		});
-	});
-	
-*/
 
