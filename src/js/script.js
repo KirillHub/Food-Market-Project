@@ -548,118 +548,72 @@ window.addEventListener('DOMContentLoaded', function () {
 
 
 
-	// Calc
+	//? Calc
+	const result = document.querySelector('.calculating__result span');
+	let sex, height, weight, age, ratio;
 
-	const result = document.querySelector('.calculating__result span'),
-		choosedMaleParentBlock = document.querySelector('.calculating__choose'),
-		calculatingChooseMediumParent = document.querySelector('.calculating__choose_medium'),
-		physicallyActiveChoose = document.querySelector('.calculating__choose_big');
+	function calcTotal() {
+		if (!sex || !height || !weight || !age || !ratio) {
+			result.textContent = '____';
+			return;
+		};
 
-
-	function calculateCalories(choosedMaleParent = []) {
-
-		choosedMaleParent.forEach(item => {
-
-			item.addEventListener('click', e => {
-
-				choosedMaleParent.forEach(childrenItems => {
-					if (childrenItems.tagName === 'DIV'
-						&& childrenItems.classList.contains('calculating__choose-item_active')) {
-						childrenItems.classList.remove('calculating__choose-item_active');
-						e.target.classList.add('calculating__choose-item_active');
-					};
-				});
-				localStorage.setItem('choosedMale', e.target.id)
-
-			});
-		});
+		if (sex === 'female') {
+			result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio);
+		} else {
+			result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age) * ratio));
+		}
 	};
 
+	calcTotal();
 
-	function calculatingConfiguration(calculatingChooseMediumParent) {
-		calculatingChooseMediumParent.childNodes.forEach(childInput => {
-			if (childInput.tagName === 'INPUT') {
 
-				if (childInput.textContent === '' &&
-					(localStorage.getItem('userHeight') ||
-						localStorage.getItem('userWeight') ||
-						localStorage.getItem('userAge'))) {
-					localStorage.removeItem('userHeight');
-					localStorage.removeItem('userWeight');
-					localStorage.removeItem('userAge');
-				}
+	function getStaticInformation(parentSelector, activeClass) {
+		const element = document.querySelectorAll(`${parentSelector} div`);
 
-				childInput.addEventListener('change', event => {
-
-					if (event.target.id === 'height') {
-						localStorage.setItem('userHeight', event.target.value);
-					};
-
-					if (event.target.id === 'weight') {
-						localStorage.setItem('userWeight', event.target.value);
-					};
-
-					if (event.target.id === 'age') {
-						localStorage.setItem('userAge', event.target.value);
-					};
-
-				});
+		document.querySelector(parentSelector).addEventListener('click', e => {
+			if (e.target.getAttribute('data-ratio')) {
+				ratio = +e.target.getAttribute('data-ratio');
+			} else {
+				sex = e.target.getAttribute('id');
 			}
-		});
-	};
 
-
-	function getPhysicallyActiveChoose(physicallyActiveChoose) {
-		physicallyActiveChoose.forEach(physicallyActiveChooseItem => {
-
-			physicallyActiveChooseItem.addEventListener('click', event => {
-
-				physicallyActiveChoose.forEach(item => {
-					if (item.tagName === 'DIV'
-						&& item.classList.contains('calculating__choose-item_active')) {
-						item.classList.remove('calculating__choose-item_active');
-						event.target.classList.add('calculating__choose-item_active');
-
-						const dataRationValue = event.target.getAttribute('data-ratio');
-						localStorage.setItem('dataRationValue', dataRationValue);
-					};
-				});
-
+			element.forEach(elem => {
+				elem.classList.remove(activeClass);
 			});
 
+			e.target.classList.add(activeClass);
+
+			calcTotal();
 		});
+	}
+	getStaticInformation('#gender', 'calculating__choose-item_active');
+	getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active');
+
+
+	function getDynamicInformation(selector) {
+		const input = document.querySelector(selector);
+
+		input.addEventListener('input', () => {
+			switch (input.getAttribute('id')) {
+				case 'height':
+					height = +input.value;
+					break;
+				case 'weight':
+					weight = +input.value;
+					break;
+				case 'age':
+					age = +input.value;
+					break;
+			};
+			calcTotal();
+		});
+
 	};
 
-	getPhysicallyActiveChoose(physicallyActiveChoose.childNodes);
-	calculateCalories(choosedMaleParentBlock.childNodes);
-	calculatingConfiguration(calculatingChooseMediumParent)
-
-
-	const calculateDailyCalorieIntake = (result) => {
-		const localStorageData = localStorage;
-
-		let maleData = localStorageData.getItem('choosedMale');
-
-		if (maleData === 'male') maleData = 88.36;
-		if (maleData === 'female') maleData = 447.6;
-
-		console.log(maleData);
-
-	};
-	calculateDailyCalorieIntake(result);
-
-
-	/*
-	
-	*/
-
-	/*
-		const height = document.querySelector('#height');
-		height.addEventListener('change', event => {
-			console.log(event.target.value);
-		})
-	*/
+	getDynamicInformation('#height');
+	getDynamicInformation('#weight');
+	getDynamicInformation('#age');
 
 });
-
 
