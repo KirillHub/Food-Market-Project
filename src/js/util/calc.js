@@ -121,3 +121,6 @@ const calculateDailyCalorieIntake = (result) => {
 	})
 };
 calculateDailyCalorieIntake(result);
+
+
+ 
