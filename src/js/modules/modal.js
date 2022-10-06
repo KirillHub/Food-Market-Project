@@ -7,6 +7,7 @@ function openModal(modalSelector, autoOpenModalWindow) {
 	// modal.classList.toggle('show');
 	document.body.style.overflow = 'hidden';
 
+	//TODO: fix this!
 	console.log(autoOpenModalWindow);
 	if (autoOpenModalWindow) clearInterval(autoOpenModalWindow);
 };
@@ -18,13 +19,6 @@ function closeModal(modalSelector) {
 	modal.classList.remove('show');
 	// modal.classList.toggle('show');
 	document.body.style.overflow = '';
-
-	// if (modal.firstChild) {
-	// 	while (modal.childNodes.length >= 2) {
-	// 		modal.removeChild(modal.firstChild);
-	// 	}
-	// }
-
 };
 
 

@@ -1,18 +1,5 @@
 const cards = () => {
 
-	/*
-	const getResource = async (url) => {
-		const res = await fetch(url);
-
-		if (!res.ok) {
-			throw new Error(`Could not fetch ${url}, status ${res.status}`);
-		}
-
-		return await res.json();
-	};
-	*/
-
-	//? Используем классы для карточек + fetch requests:
 	class MenuCard {
 		constructor(src, alt, title, descr, price, parentSelector, ...classes) {
 			this.src = src;
@@ -62,7 +49,6 @@ const cards = () => {
 						price, '.menu .container').render();
 				});
 			});
-	
 	*/
 
 	//? переключение слайдера с помощью библиотеки axios
