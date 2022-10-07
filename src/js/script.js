@@ -1,7 +1,3 @@
-import "es6-promise-polyfill";
-import 'nodelist-foreach-polyfill';
-import 'slick-carousel';
-
 import tabs from './modules/tabs';
 import modal from './modules/modal';
 import timer from './modules/timer';
