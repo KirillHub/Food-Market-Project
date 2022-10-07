@@ -12,12 +12,26 @@
   },
   "author": "",
   "license": "ISC",
+  "browserslist": [
+    "> 1%"
+  ],
   "bugs": {
     "url": "https://github.com/KirillHub/Food-website/issues"
   },
   "homepage": "https://github.com/KirillHub/Food-website#readme",
   "devDependencies": {
+    "@babel/cli": "^7.19.3",
+    "@babel/core": "^7.19.3",
+    "@babel/preset-env": "^7.19.3",
+    "babel-loader": "^8.2.5",
+    "core-js": "^3.25.5",
     "json-server": "^0.17.0",
     "webpack-cli": "^4.10.0"
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "es6-promise-polyfill": "^1.2.0",
+    "nodelist-foreach-polyfill": "^1.2.0",
+    "slick-carousel": "^1.8.1"
   }
 }
